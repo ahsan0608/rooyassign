@@ -217,6 +217,7 @@ kubectl port-forward svc/prometheus-kube-prometheus-alertmanager 9093:9093 -n pr
    - Kubernetes deployment
    - Service mesh configuration
    ![GitOps Flow](https://github.com/user-attachments/assets/987f8bae-2c98-44e3-aefb-79e737114eae)
+
 4. Public Access:
    - Ingress routing
    - TLS termination
