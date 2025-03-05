@@ -21,11 +21,11 @@ spec:
         command: ['sh', '-c', 'tail -f /dev/null']
         imagePullPolicy: IfNotPresent
         securityContext:
-          readOnlyRootFilesystem: true
-          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true  # Make root filesystem read-only
+          allowPrivilegeEscalation: false  # Prevent privilege escalation
         volumeMounts:
         - name: tmp-volume
-          mountPath: /tmp
+          mountPath: /tmp  # Allow writing to /tmp
         livenessProbe:
           exec:
             command:
@@ -40,7 +40,7 @@ spec:
           periodSeconds: 10
       volumes:
       - name: tmp-volume
-        emptyDir: {}
+        emptyDir: {}  # Create an empty directory for /tmp
 ---
 apiVersion: v1
 kind: Namespace
