@@ -1,0 +1,32 @@
+# Enable metrics collection
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    namespace: project-plato
+    interval: 30s
+    scrapeTimeout: 10s
+    labels:
+      release: prometheus
+
+# Configure Postgres
+global:
+  postgresql:
+    auth:
+      postgresPassword: "rooya-postgres-password"
+      username: "rooya-user"
+      password: "rooya-password"
+      database: "rooya-db"
+
+primary:
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9187"
+
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m" 

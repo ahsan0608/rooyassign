@@ -1,0 +1,134 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config-db1
+  namespace: project-plato
+data:
+  nginx.conf: |
+    events {}
+    http {
+        server {
+            listen 6379;
+            location / {
+                return 200 'db1 running on port 6379';
+            }
+        }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: project-plato
+  name: db1
+  labels:
+    app: db1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db1
+  template:
+    metadata:
+      labels:
+        app: db1
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.16.1-alpine
+        command: ["nginx", "-g", "daemon off;"]
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+          readOnly: true
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-config-db1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: project-plato
+  name: db1
+spec:
+  selector:
+    app: db1
+  ports:
+  - port: 6379
+    targetPort: 6379
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config-db2
+  namespace: project-plato
+data:
+  nginx.conf: |
+    events {}
+    http {
+        server {
+            listen 5432;
+            location / {
+                return 200 'db2 running on port 5432';
+            }
+        }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: project-plato
+  name: db2
+  labels:
+    app: db2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db2
+  template:
+    metadata:
+      labels:
+        app: db2
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.16.1-alpine
+        command: ["nginx", "-g", "daemon off;"]
+        ports:
+        - containerPort: 5432
+        env:
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: db2-credentials
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db2-credentials
+              key: password
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+          readOnly: true
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-config-db2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: project-plato
+  name: db2
+spec:
+  selector:
+    app: db2
+  ports:
+  - port: 5432
+    targetPort: 5432
